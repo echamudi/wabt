@@ -709,6 +709,77 @@ bool WastParser::ParseTextListOpt(std::vector<uint8_t>* out_data) {
   return !texts.empty();
 }
 
+bool WastParser::ParseDataLiteralListOpt(std::vector<uint8_t>* out_data) {
+  WABT_TRACE(ParseDataLiteralListOpt);
+
+  while (true) {
+    if (PeekMatch(TokenType::Text)) {
+      // If it's a string e.g. "something"
+      RemoveEscapes(Consume().text(), std::back_inserter(*out_data));
+    } else if (PeekMatchLpar(TokenType::ValueType)) {
+      // If it's a number vector e.g. (i32 0x12 0x64 0xABCD)
+      CHECK_RESULT(ParseNumberVector(out_data));
+    } else {
+      break;
+    }
+  }
+
+  return !out_data->empty();
+}
+
+Result WastParser::ParseNumberVector(std::vector<uint8_t>* out_data) {
+  WABT_TRACE(ParseNumberVector);
+  EXPECT(Lpar);
+  Token valtype_token = Consume();
+  Type valtype = valtype_token.type();
+
+  while (!PeekMatch(TokenType::Rpar)) {
+    switch (Peek()) {
+      case TokenType::Nat:
+      case TokenType::Int:
+      case TokenType::Float:
+      case TokenType::NanArithmetic:
+      case TokenType::NanCanonical:
+        break;
+      default:
+        return ErrorExpected({"a numeric literal"}, "123, -45, 6.7e8");
+    }
+
+    Token nl_token = Consume();
+    string_view nl = nl_token.literal().text;
+
+    switch (valtype) {
+    case Type::I8:
+      break;
+    case Type::I16:
+      break;
+    case Type::I32:
+      {
+        uint32_t u32;
+        CHECK_RESULT(ParseInt32(nl.begin(), nl.end(), &u32, 
+                                ParseIntType::SignedAndUnsigned));
+
+        for (size_t i = 0; i < 4; i++)
+          out_data->push_back(u32 >> i * 8);
+
+        break;
+      }
+    case Type::I64:
+      break;
+    case Type::F32:
+      break;
+    case Type::F64:
+      break;
+    default:
+      return ErrorExpected({"supported valtype"}, "i8, i16, i32, i64, f32, or f64");
+      break;
+    }
+  }
+
+  EXPECT(Rpar);
+  return Result::Ok;
+}
+
 Result WastParser::ParseVarList(VarVector* out_var_list) {
   WABT_TRACE(ParseVarList);
   Var var;
@@ -1075,7 +1146,8 @@ Result WastParser::ParseDataModuleField(Module* module) {
     field->data_segment.kind = SegmentKind::Passive;
   }
 
-  ParseTextListOpt(&field->data_segment.data);
+  // ParseTextListOpt(&field->data_segment.data);
+  ParseDataLiteralListOpt(&field->data_segment.data);
   EXPECT(Rpar);
   module->AppendField(std::move(field));
   return Result::Ok;
