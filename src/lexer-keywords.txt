@@ -159,6 +159,7 @@ global.get, TokenType::GlobalGet, Opcode::GlobalGet
 global.set, TokenType::GlobalSet, Opcode::GlobalSet
 global, TokenType::Global
 grow_memory, TokenType::MemoryGrow, Opcode::MemoryGrow
+i16, Type::I16
 i16x8.abs, TokenType::Unary, Opcode::I16X8Abs
 i16x8.add_saturate_s, TokenType::Binary, Opcode::I16X8AddSaturateS
 i16x8.add_saturate_u, TokenType::Binary, Opcode::I16X8AddSaturateU
@@ -422,6 +423,7 @@ i64x2.splat, TokenType::Unary, Opcode::I64X2Splat
 i64x2.sub, TokenType::Binary, Opcode::I64X2Sub
 i64x2, TokenType::I64X2
 i64.xor, TokenType::Binary, Opcode::I64Xor
+i8, Type::I8
 i8x16.abs, TokenType::Unary, Opcode::I8X16Abs
 i8x16.add_saturate_s, TokenType::Binary, Opcode::I8X16AddSaturateS
 i8x16.add_saturate_u, TokenType::Binary, Opcode::I8X16AddSaturateU
