@@ -754,13 +754,15 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         return Result::Error;
     }
 
-    Token nl_token = Consume();
+    Token nl_token = GetToken();
     string_view nl = nl_token.literal().text;
 
     Result result;
     switch (valtype) {
     case Type::I8:
       {
+        Consume();
+
         uint8_t u8;
         result = ParseInt8(nl.begin(), nl.end(), &u8,
                                 ParseIntType::SignedAndUnsigned);
@@ -769,6 +771,8 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
       }
     case Type::I16:
       {
+        Consume();
+
         uint16_t u16;
         result = ParseInt16(nl.begin(), nl.end(), &u16,
                                 ParseIntType::SignedAndUnsigned);
@@ -780,6 +784,8 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
       }
     case Type::I32:
       {
+        Consume();
+
         uint32_t u32;
         result = ParseInt32(nl.begin(), nl.end(), &u32,
                                 ParseIntType::SignedAndUnsigned);
@@ -791,6 +797,8 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
       }
     case Type::I64:
       {
+        Consume();
+
         uint64_t u64;
         result = ParseInt64(nl.begin(), nl.end(), &u64,
                                 ParseIntType::SignedAndUnsigned);
@@ -801,7 +809,18 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         break;
       }
     case Type::F32:
-      break;
+      {
+        Const f32_const;
+
+        result = ParseF32(&f32_const, ConstType::Normal);
+
+        uint32_t u32 = f32_const.f32_bits();
+        uint8_t* byte = reinterpret_cast<uint8_t*>(&u32);
+
+        for (size_t i = 0; i < 4; i++)
+          out_data->push_back(byte[i]);
+        break;
+      }
     case Type::F64:
       break;
     default:
