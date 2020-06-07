@@ -756,71 +756,53 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
 
     Token nl_token = GetToken();
     string_view nl = nl_token.literal().text;
-
+    union {
+      uint8_t byte[8];
+      uint16_t u16;
+      uint32_t u32;
+      uint64_t u64;
+    };
+    Const f_const;
     Result result;
+
     switch (valtype) {
     case Type::I8:
-      {
-        Consume();
-
-        uint8_t u8;
-        result = ParseInt8(nl.begin(), nl.end(), &u8,
-                                ParseIntType::SignedAndUnsigned);
-        out_data->push_back(u8);
-        break;
-      }
+      Consume();
+      result = ParseInt8(nl.begin(), nl.end(), &byte[0],
+                         ParseIntType::SignedAndUnsigned);
+      out_data->push_back(byte[0]);
+      break;
     case Type::I16:
-      {
-        Consume();
+      Consume();
+      result = ParseInt16(nl.begin(), nl.end(), &u16,
+                          ParseIntType::SignedAndUnsigned);
 
-        uint16_t u16;
-        result = ParseInt16(nl.begin(), nl.end(), &u16,
-                                ParseIntType::SignedAndUnsigned);
-        uint8_t* byte = reinterpret_cast<uint8_t*>(&u16);
-
-        for (size_t i = 0; i < 2; i++)
-          out_data->push_back(byte[i]);
-        break;
-      }
+      for (size_t i = 0; i < 2; i++)
+        out_data->push_back(byte[i]);
+      break;
     case Type::I32:
-      {
-        Consume();
+      Consume();
+      result = ParseInt32(nl.begin(), nl.end(), &u32,
+                          ParseIntType::SignedAndUnsigned);
 
-        uint32_t u32;
-        result = ParseInt32(nl.begin(), nl.end(), &u32,
-                                ParseIntType::SignedAndUnsigned);
-        uint8_t* byte = reinterpret_cast<uint8_t*>(&u32);
-
-        for (size_t i = 0; i < 4; i++)
-          out_data->push_back(byte[i]);
-        break;
-      }
+      for (size_t i = 0; i < 4; i++)
+        out_data->push_back(byte[i]);
+      break;
     case Type::I64:
-      {
-        Consume();
+      Consume();
+      result = ParseInt64(nl.begin(), nl.end(), &u64,
+                          ParseIntType::SignedAndUnsigned);
 
-        uint64_t u64;
-        result = ParseInt64(nl.begin(), nl.end(), &u64,
-                                ParseIntType::SignedAndUnsigned);
-        uint8_t* byte = reinterpret_cast<uint8_t*>(&u64);
-
-        for (size_t i = 0; i < 8; i++)
-          out_data->push_back(byte[i]);
-        break;
-      }
+      for (size_t i = 0; i < 8; i++)
+        out_data->push_back(byte[i]);
+      break;
     case Type::F32:
-      {
-        Const f32_const;
+      result = ParseF32(&f_const, ConstType::Normal);
+      u32 = f_const.f32_bits();
 
-        result = ParseF32(&f32_const, ConstType::Normal);
-
-        uint32_t u32 = f32_const.f32_bits();
-        uint8_t* byte = reinterpret_cast<uint8_t*>(&u32);
-
-        for (size_t i = 0; i < 4; i++)
-          out_data->push_back(byte[i]);
-        break;
-      }
+      for (size_t i = 0; i < 4; i++)
+        out_data->push_back(byte[i]);
+      break;
     case Type::F64:
       break;
     default:
@@ -828,7 +810,8 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
     }
 
     if (Failed(result)) {
-      Error(nl_token.loc, "invalid literal \"%s\"", nl_token.to_string().c_str());
+      Error(nl_token.loc, "invalid literal \"%s\"",
+            nl_token.to_string().c_str());
       return Result::Error;
     }
   }
