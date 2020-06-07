@@ -804,6 +804,11 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         out_data->push_back(byte[i]);
       break;
     case Type::F64:
+      result = ParseF64(&f_const, ConstType::Normal);
+      u64 = f_const.f64_bits();
+
+      for (size_t i = 0; i < 8; i++)
+        out_data->push_back(byte[i]);
       break;
     default:
       assert(!"Unknown ValType");
