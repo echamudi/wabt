@@ -1186,7 +1186,6 @@ Result WastParser::ParseDataModuleField(Module* module) {
     field->data_segment.kind = SegmentKind::Passive;
   }
 
-  // ParseTextListOpt(&field->data_segment.data);
   CHECK_RESULT(ParseDataLiteralList(&field->data_segment.data));
   EXPECT(Rpar);
   module->AppendField(std::move(field));
