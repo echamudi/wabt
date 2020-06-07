@@ -772,9 +772,10 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         uint16_t u16;
         result = ParseInt16(nl.begin(), nl.end(), &u16,
                                 ParseIntType::SignedAndUnsigned);
+        uint8_t* byte = reinterpret_cast<uint8_t*>(&u16);
 
         for (size_t i = 0; i < 2; i++)
-          out_data->push_back(u16 >> i * 8);
+          out_data->push_back(byte[i]);
         break;
       }
     case Type::I32:
@@ -782,9 +783,10 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         uint32_t u32;
         result = ParseInt32(nl.begin(), nl.end(), &u32,
                                 ParseIntType::SignedAndUnsigned);
+        uint8_t* byte = reinterpret_cast<uint8_t*>(&u32);
 
         for (size_t i = 0; i < 4; i++)
-          out_data->push_back(u32 >> i * 8);
+          out_data->push_back(byte[i]);
         break;
       }
     case Type::I64:
@@ -792,12 +794,12 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
         uint64_t u64;
         result = ParseInt64(nl.begin(), nl.end(), &u64,
                                 ParseIntType::SignedAndUnsigned);
+        uint8_t* byte = reinterpret_cast<uint8_t*>(&u64);
 
         for (size_t i = 0; i < 8; i++)
-          out_data->push_back(u64 >> i * 8);
+          out_data->push_back(byte[i]);
         break;
       }
-      break;
     case Type::F32:
       break;
     case Type::F64:
