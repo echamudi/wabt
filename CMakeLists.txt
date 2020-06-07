@@ -628,7 +628,7 @@ if (EMSCRIPTEN)
   # build to JS for now, as node.js doesn't have code caching for wasm yet, and
   # wasm startup times are slower
   foreach(variable CMAKE_EXE_LINKER_FLAGS)
-    set(${variable} "${${variable}} -s NODERAWFS -s SINGLE_FILE -s WASM=0 -Oz -s ALLOW_MEMORY_GROWTH=1")
+    set(${variable} "${${variable}} -s NODERAWFS=0 -s SINGLE_FILE -s WASM=0 -Oz -s ALLOW_MEMORY_GROWTH=1")
   endforeach(variable)
 
   # wabt.js
