@@ -772,44 +772,45 @@ Result WastParser::ParseNumericValueVector(std::vector<uint8_t>* out_data) {
                          ParseIntType::SignedAndUnsigned);
       out_data->push_back(byte[0]);
       break;
+
     case Type::I16:
       Consume();
       result = ParseInt16(nl.begin(), nl.end(), &u16,
                           ParseIntType::SignedAndUnsigned);
-
       for (size_t i = 0; i < 2; i++)
         out_data->push_back(byte[i]);
       break;
+
     case Type::I32:
       Consume();
       result = ParseInt32(nl.begin(), nl.end(), &u32,
                           ParseIntType::SignedAndUnsigned);
-
       for (size_t i = 0; i < 4; i++)
         out_data->push_back(byte[i]);
       break;
+
     case Type::I64:
       Consume();
       result = ParseInt64(nl.begin(), nl.end(), &u64,
                           ParseIntType::SignedAndUnsigned);
-
       for (size_t i = 0; i < 8; i++)
         out_data->push_back(byte[i]);
       break;
+
     case Type::F32:
       result = ParseF32(&f_const, ConstType::Normal);
       u32 = f_const.f32_bits();
-
       for (size_t i = 0; i < 4; i++)
         out_data->push_back(byte[i]);
       break;
+
     case Type::F64:
       result = ParseF64(&f_const, ConstType::Normal);
       u64 = f_const.f64_bits();
-
       for (size_t i = 0; i < 8; i++)
         out_data->push_back(byte[i]);
       break;
+
     default:
       assert(!"Unknown ValType");
     }
@@ -1547,7 +1548,7 @@ Result WastParser::ParseMemoryModuleField(Module* module) {
     data_segment.memory_var = Var(module->memories.size());
     data_segment.offset.push_back(MakeUnique<ConstExpr>(Const::I32(0)));
     data_segment.offset.back().loc = loc;
-    ParseTextListOpt(&data_segment.data);
+    CHECK_RESULT(ParseDataLiteralList(&data_segment.data));
     EXPECT(Rpar);
 
     auto memory_field = MakeUnique<MemoryModuleField>(loc, name);
