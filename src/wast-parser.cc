@@ -1547,7 +1547,7 @@ Result WastParser::ParseMemoryModuleField(Module* module) {
     data_segment.memory_var = Var(module->memories.size());
     data_segment.offset.push_back(MakeUnique<ConstExpr>(Const::I32(0)));
     data_segment.offset.back().loc = loc;
-    ParseTextListOpt(&data_segment.data);
+    CHECK_RESULT(ParseDataLiteralList(&data_segment.data));
     EXPECT(Rpar);
 
     auto memory_field = MakeUnique<MemoryModuleField>(loc, name);
