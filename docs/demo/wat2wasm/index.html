@@ -24,19 +24,10 @@
 </head>
 <body>
   <header>
-    <h1>wat2wasm demo</h1>
-    <p>WebAssembly has a
-      <a href="https://webassembly.github.io/spec/core/text/index.html">text format</a>
-      and a
-      <a href="https://webassembly.github.io/spec/core/binary/index.html">binary format</a>.
-      This demo converts from the text format to the binary format.
+    <h1 style="font-size: 20px;line-height: unset;margin: 10px 0;">wat2wasm demo (numeric value data proposal)</h1>
+    <p>This demo contains the implementation of <a href="https://github.com/echamudi/numeric-values-in-data-segments-wasm-proposal/">numeric values in WAT data segments proposal</a>. 
+      Check the source code in <a href="https://github.com/echamudi/wabt/tree/patch-add-numeric-data-wat2wasm">this repo</a>.
     </p>
-    <p>
-      Enter WebAssembly text in the textarea on the left. The right side will
-      either show an error, or will show a log with a description of the
-      generated binary file.
-    </p>
-    <div>Enabled features:</div>
     <div>
       <input type="checkbox" id="exceptions"><label for="exceptions">exceptions</label>
       <input type="checkbox" id="mutable_globals" checked><label for="mutable_globals">mutable globals</label>
